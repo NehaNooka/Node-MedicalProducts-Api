@@ -1,24 +1,49 @@
 const express = require('express')
 const router = new express.Router()
 const Product = require('../models/products')
-
+const User = require('../models/user')
+const auth = require("./../middleware/auth")
 //Add Product
-router.post("/products", async (req, res) => {
-    const product = new Product(req.body)
-
+router.post("/products", auth, async (req, res) => {
+    const product = new Product({
+        ...req.body,
+        owner: req.user._id
+    })
     try {
         await product.save()
+        await req.user.products.unshift(product)
+        await req.user.save()
         res.status(201).send({ product })
+
     } catch (e) {
         res.status(400).send(e.message)
     }
 })
 //Read all Products
 router.get("/products/all", async (req, res) => {
-    Product.find({}).exec((err, result) => {
+    Product.find({}).populate('comments').exec((err, result) => {
         res.send(result)
     })
 })
+//Read products by Type
+//GET /products?type=new
+router.get("/products", auth, async (req, res) => {
+    try {
+        Product.find({ type: req.query.type }).populate('comments').exec((err, result) => {
+            res.send(result)
+        })
+    } catch (e) {
+        res.status(500).send()
+
+    }
+
+})
+//Read most recent product
+router.get("/products/recent", auth, async (req, res) => {
+    Product.findOne().sort('-created_at').exec(function (err, product) { res.send(product) });
+
+})
+
 // Read Product by id
 router.get("/products/:id", async (req, res) => {
     Product.findById(req.params.id).exec((err, result) => {
@@ -29,11 +54,42 @@ router.get("/products/:id", async (req, res) => {
         res.send(result)
     })
 })
-//Update a product
+//Like/Dislike a product
+router.post("/products/:id", auth, async (req, res) => {
+    
+    try {
+        if(req.query.like === 'true'){
+            await Product.findOneAndUpdate({_id:req.params.id},{$inc:{likes:1}},{'new':true})
+            res.send('Liked the product')
+            console.log(req.query.like)
+        }
+        else{
+            await Product.findOneAndUpdate({_id:req.params.id},{$inc :{likes:-1}},{'new':true})
+            res.send('Disliked the product')
+            console.log(req.query.like)
+        }
 
-router.patch('/products/:id', async (req, res) => {
+    } catch (e) {
+        res.status(400).send(e)
+    }
+
+});
+//Get Most liked product
+router.get("/mostlikedProduct", auth, async (req, res) => {
+    
+    try {
+        const product = await Product.find().sort({likes:-1}).limit(1)
+        res.status(200).send({product})
+    } catch (e) {
+        res.status(400).send(e)
+    }
+
+});
+
+//Update a product
+router.patch('/products/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates =  ["type","price","productName"]
+    const allowedUpdates = ["type", "price", "productName"]
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -41,7 +97,7 @@ router.patch('/products/:id', async (req, res) => {
     }
 
     try {
-        const result = await Product.findOne({ _id: req.params.id })
+        const result = await Product.findOne({ _id: req.params.id, owner: req.user._id })
 
         updates.forEach((update) => result[update] = req.body[update])
 
@@ -60,9 +116,9 @@ router.patch('/products/:id', async (req, res) => {
 })
 
 //Delete a product
-router.delete('/products/:id', async (req, res) => {
+router.delete('/products/:id', auth, async (req, res) => {
     try {
-        const product = await Product.findOneAndDelete({ _id: req.params.id })
+        const product = await Product.findOneAndDelete({ _id: req.params.id, owner: req.user._id })
 
         if (!product) {
             return res.status(404).send()

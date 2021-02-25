@@ -40,7 +40,7 @@ router.post('/users/logout',auth,async (req,res)=>{
     }
 })
 //Read all users
-router.get('/users',auth, async (req, res) => {
+router.get('/users', async (req, res) => {
     try {
         const users = await User.find({})
         res.send(users)
@@ -53,7 +53,7 @@ router.get('/users',auth, async (req, res) => {
 
 router.patch('/users/me',auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'email', 'password', 'age']
+    const allowedUpdates = ['name', 'email', 'password']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {

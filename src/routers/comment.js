@@ -3,10 +3,14 @@ const router = new express.Router()
 
 const Comment = require('../models/comment')
 const Product = require('../models/products')
+const auth = require('../middleware/auth')
 
-router.post("/products/:productId/comment", async (req, res) => {
+router.post("/products/:productId/comment", auth, async (req, res) => {
     // INSTANTIATE INSTANCE OF MODEL
-    const comment = new Comment(req.body);
+    const comment = new Comment({
+        ...req.body,
+        by: req.user._id
+    });
 
     try {
         await comment.save()

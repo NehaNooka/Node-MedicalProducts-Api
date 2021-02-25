@@ -1,10 +1,13 @@
 const express = require('express')
 const router = new express.Router()
 const ProductType = require('../models/productTypes')
+const auth=require("./../middleware/auth")
 
 //Create Product Type
-router.post('/productType', async(req, res) => {
-    const productType = new ProductType(req.body)
+router.post('/productType',auth, async(req, res) => {
+    const productType = new ProductType({...req.body,
+    owner:req.user._id
+    })
     try {
         await productType.save()
         res.status(201).send(productType)

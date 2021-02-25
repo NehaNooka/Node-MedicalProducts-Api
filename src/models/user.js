@@ -34,7 +34,9 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
-    products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+    products: [
+        { type: mongoose.Schema.Types.ObjectId, ref: 'Product' }
+    ],
     tokens:[{
         token:{
             type:String,
@@ -45,12 +47,16 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 })
 
+// userSchema.virtual('product',{
+//     ref: 'Product',
+//     localField:'_id',
+//     foreignField:'owner'
+// })
 userSchema.methods.toJSON = function (){
     const user=this
     const userObject = user.toObject()
     delete userObject.password
     delete userObject.tokens
-
     return userObject
 }
 //Auth User
@@ -94,5 +100,5 @@ userSchema.pre('remove',async function(next){
     })
         next()
      })
-    const User = mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema)
 module.exports = User
