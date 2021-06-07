@@ -1,6 +1,5 @@
 # Node-MedicalProduct-Api</br>
-## [Link](https://www.getpostman.com/collections/ab38b1e3d6a1741bc978)
-## APIs- 
+## [APIs](https://www.getpostman.com/collections/ab38b1e3d6a1741bc978)
      - Register user
      - Login user 
      - Logout user
