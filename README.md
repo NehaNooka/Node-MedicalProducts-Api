@@ -1,20 +1,22 @@
 # Node-MedicalProduct-Api</br>
-## APIS- 
-     - register user
-     - login user 
+## [Link](https://www.getpostman.com/collections/ab38b1e3d6a1741bc978)
+## APIs- 
+     - Register user
+     - Login user 
+     - Logout user
 
-     - create product types 
-     - get all product types
+     - Create product types 
+     - Get all product types
 
-     - create medical product 
-     - edit medical product
-     - delete medical product
-     - get all medical product
+     - Create medical product 
+     - Edit medical product
+     - Delete medical product
+     - Get all medical product
       
-     - get medical product by product types 
-     - get most recent product 
-     - get most liked product
-     - comment on product
+     - Get medical product by product types 
+     - Get most recent product 
+     - Get most liked product
+     - Comment on product
 # Steps</br>
      - Step1: connect to local db: Run /Users/NEHA/mongodb/bin/mongod.exe --dbpath=/Users/NEHA/mongodb-data in terminal
      - Step2: connect to Postman and Studio 3T
